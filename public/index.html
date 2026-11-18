@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ふたりと家族の紹介</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* 霧のような薄いグレーの地に白いシートを重ねる。差し色は赤1色。縦1列のアプリ型。 */
+:root{
+  --bg:#F1F3F7; --surface:#FFFFFF; --ink:#4A1C28; --muted:#6B6F7B; --line:#D5D8E0;
+  --accent:#C8202F; --taupe:#7A6455; --mist:#E3E8F0; --focus:#1F4FD8;
+  --display:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --body:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',Meiryo,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.8;-webkit-text-size-adjust:100%}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#app{max-width:520px;margin:0 auto;min-height:100%;background:var(--bg);position:relative;padding-bottom:96px}
+
+/* ヘッダー */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.top .tag{display:flex;align-items:center;gap:10px;font-family:var(--display);font-style:italic;font-weight:600;font-size:20px;color:var(--taupe)}
+.pill{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;letter-spacing:.08em}
+.pill.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.note{margin:12px 16px 0;padding:10px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);font-size:13px;line-height:1.7;color:var(--muted)}
+.note.edit{border-color:var(--accent);color:var(--ink)}
+#status:empty{display:none}
+
+/* ホーム */
+.hero{position:relative;height:300px;background:var(--mist);overflow:hidden}
+.cloud{position:absolute;border-radius:50%;background:#fff;filter:blur(22px)}
+.flag{position:absolute;top:0;left:24px;width:44px;height:58px;background:var(--accent);color:#fff;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-family:var(--display);font-style:italic;font-weight:600;font-size:24px;line-height:1}
+.heroPhoto{position:absolute;top:56px;left:60px;right:60px;height:190px;border-radius:24px;background:rgba(255,255,255,.72);box-shadow:0 18px 40px rgba(40,30,60,.14);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;overflow:hidden}
+.heroPhoto img{width:100%;height:100%;object-fit:cover;display:block}
+.sheet{position:relative;margin-top:-28px;background:var(--surface);border-radius:28px 28px 0 0;padding:32px 24px;box-shadow:0 -8px 30px rgba(40,30,60,.06)}
+h1.display{margin:0;font-family:var(--display);font-style:italic;font-weight:600;font-size:40px;line-height:1.1;color:var(--taupe)}
+.sub{margin:6px 0 28px;font-size:14px;color:var(--muted);letter-spacing:.06em}
+.pair{display:flex;align-items:flex-end;gap:10px}
+.fld{flex:1;min-width:0;border-bottom:1px solid var(--line);padding-bottom:6px}
+.fld.r{text-align:right}
+.lab{display:block;font-size:12px;color:var(--muted);letter-spacing:.14em}
+.val{display:block;font-weight:500;font-size:26px;line-height:1.4;overflow-wrap:anywhere}
+.val.s{font-size:15px;font-weight:400}
+.row2{display:flex;gap:20px;margin-top:20px}
+.cta{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;margin-top:28px;border:0;border-radius:16px;background:var(--accent);color:#fff;font-weight:700;font-size:16px;letter-spacing:.12em;box-shadow:0 10px 24px rgba(200,32,47,.28)}
+.ghost{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin-top:8px;border:0;background:transparent;font-weight:500;font-size:15px;letter-spacing:.1em}
+
+/* 入力欄 */
+.in{width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:16px;line-height:1.5}
+.in.big{font-size:22px;font-weight:500}
+textarea.in{resize:vertical;min-height:84px}
+.photoBtn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);background:#fff;font-weight:700;font-size:14px;cursor:pointer}
+.photoBtn:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+.link{min-height:44px;padding:0 12px;border:0;background:transparent;color:var(--muted);font-size:14px;text-decoration:underline}
+.tools{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;margin-top:10px}
+
+/* ページ見出し */
+.page{padding:44px 24px 8px}
+h2.display{margin:0;font-family:var(--display);font-style:italic;font-weight:600;font-size:44px;line-height:1.1;color:var(--taupe)}
+.page p.sub{margin:4px 0 24px}
+
+/* ストーリー */
+.tl{list-style:none;margin:0;padding:0 24px}
+.tl li{display:flex;gap:14px;padding-bottom:28px}
+.when{flex:0 0 64px;font-family:var(--display);font-weight:600;font-size:20px;line-height:1.5}
+.rail{flex:0 0 9px;display:flex;flex-direction:column;align-items:center}
+.rail i{display:block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-top:10px}
+.rail b{display:block;flex:1;width:1px;background:var(--line)}
+.body{flex:1;min-width:0}
+.body h3{margin:0;font-weight:500;font-size:19px;line-height:1.5}
+.body p{margin:0;color:var(--muted);font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.ph{display:flex;align-items:center;justify-content:center;height:140px;margin-top:12px;border-radius:18px;background:var(--mist);color:var(--muted);font-size:13px;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.qa{margin:8px 24px 0;background:var(--surface);border-radius:24px;box-shadow:0 12px 32px rgba(40,30,60,.08);padding:8px 22px}
+.qa>div{padding:14px 0;border-bottom:1px solid var(--line)}
+.qa>div:last-child{border-bottom:0}
+.qa .lab{margin-bottom:2px}
+.qa p{margin:0;font-size:15px;overflow-wrap:anywhere}
+h3.display{margin:36px 24px 8px;font-family:var(--display);font-style:italic;font-weight:600;font-size:30px;color:var(--taupe)}
+
+/* 家族 */
+.msg{margin:0 24px;padding:0 0 24px}
+.msg .bar{width:32px;height:2px;background:var(--accent);margin:10px 0 14px}
+.msg p{margin:0;font-weight:500;font-size:18px;line-height:2;white-space:pre-line;overflow-wrap:anywhere}
+.seg{display:flex;margin:0 16px 16px;border:1px solid var(--line);border-radius:999px;padding:4px;background:var(--surface)}
+.seg button{flex:1;min-height:44px;border:0;border-radius:999px;background:transparent;font-size:15px;letter-spacing:.15em;font-weight:500;color:#4A4A63}
+.seg button[aria-pressed="true"]{color:#fff;font-weight:700}
+.scroller{overflow-x:auto;padding:4px 16px 12px;-webkit-overflow-scrolling:touch}
+.tree{position:relative;margin:0 auto}
+.tree svg{position:absolute;left:0;top:0}
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;background:transparent;border:0;min-height:44px;z-index:1;color:var(--ink)}
+.av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:17px;background:#fff;color:var(--side);border:1.5px solid var(--side);box-shadow:0 8px 20px rgba(40,30,60,.12);overflow:hidden}
+.av.long{font-size:14px}
+.av.self{background:var(--side);color:#fff}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.node[aria-pressed="true"] .av{outline:4px solid rgba(200,32,47,.18);outline-offset:1px;border-color:var(--accent)}
+.node .rel{font-size:12px;font-weight:700;line-height:1.3;text-align:center}
+.node .nm{font-size:12px;line-height:1.3;color:var(--muted);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hint{margin:0 20px;font-size:12px;color:var(--muted)}
+.detailWrap{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom));margin:20px 16px 0;z-index:10}
+.detail{background:#fff;border-radius:24px;box-shadow:0 14px 40px rgba(40,30,60,.22);padding:18px 20px;max-height:70vh;overflow-y:auto}
+.detail .head{display:flex;align-items:center;gap:14px}
+.detail .pic{flex:0 0 60px;width:60px;height:60px;border-radius:50%;background:var(--mist);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;overflow:hidden}
+.detail .pic img{width:100%;height:100%;object-fit:cover}
+.detail .who{flex:1;min-width:0}
+.detail .rl{margin:0;font-size:12px;letter-spacing:.12em;color:var(--accent);font-weight:700;line-height:1.5}
+.detail .nmv{margin:0;font-weight:500;font-size:20px;line-height:1.4;overflow-wrap:anywhere}
+.x{flex:0 0 44px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:20px;line-height:1}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px;margin-top:8px}
+.grid2>div{padding:8px 0;border-bottom:1px solid var(--line)}
+.grid2 p{margin:0;font-size:15px;overflow-wrap:anywhere}
+.grid2.edit>div{border-bottom:0;padding:6px 0}
+.empty{border:1.5px dashed #B7BCC9;border-radius:24px;padding:20px;text-align:center;font-size:14px;color:var(--muted);line-height:1.8;background:var(--bg)}
+@media (max-width:420px){.grid2.edit{grid-template-columns:1fr}}
+
+/* 下のタブ */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.nav div{max-width:520px;margin:0 auto;display:flex}
+.nav button{flex:1;min-height:72px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:14px;letter-spacing:.08em;font-weight:500;color:var(--muted)}
+.nav button i{display:block;width:24px;height:2px;background:transparent}
+.nav button[aria-current="page"]{color:var(--ink);font-weight:700}
+.nav button[aria-current="page"] i{background:var(--accent)}
+@media (prefers-reduced-motion:no-preference){.sheet,.detail{transition:box-shadow .2s}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+var EDIT_KEY = new URLSearchParams(location.search).get('edit') || '';
+var EDIT_OK = EDIT_KEY !== '';
+var db = (function () {
+  var docs = {}, subs = [], lastWrite = 0, inflight = 0, first = true;
+  var emit = function () {
+    subs.forEach(function (s) {
+      if (s.kind === 'doc') {
+        var d = docs[s.path];
+        s.ok({ exists: !!d, data: function () { return d; }, metadata: { fromCache: false } });
+      } else {
+        var list = Object.keys(docs).filter(function (p) { return p.indexOf(s.path + '/') === 0; }).map(function (p) {
+          return { id: p.slice(s.path.length + 1), data: function () { return docs[p]; } };
+        });
+        s.ok({ docs: list, metadata: { fromCache: false } });
+      }
+    });
+  };
+  var poll = function () {
+    if (inflight || Date.now() - lastWrite < 4000) return;
+    fetch('/api/all', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+      if (inflight || Date.now() - lastWrite < 4000) return;
+      var same = JSON.stringify(j) === JSON.stringify(docs);
+      docs = j;
+      if (!same || first) { first = false; emit(); }
+    }).catch(function (e) { subs.forEach(function (s) { if (s.err) s.err(e); }); });
+  };
+  setInterval(function () { if (!document.hidden) poll(); }, 10000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) poll(); });
+  var write = function (path, body, merge) {
+    inflight++; lastWrite = Date.now();
+    return fetch('/api/doc/' + path, { method: 'PUT', headers: { 'content-type': 'application/json', 'x-edit-key': EDIT_KEY },
+      body: JSON.stringify({ data: body, merge: merge }) }).then(function (r) {
+      if (r.status === 401 || r.status === 403) { var e = new Error('denied'); e.code = 'invalid_argument'; throw e; }
+      if (r.status === 413) { var e2 = new Error('big'); e2.code = 'quota_exceeded'; throw e2; }
+      if (!r.ok) throw new Error('http ' + r.status);
+      docs[path] = merge ? Object.assign({}, docs[path] || {}, body) : body;
+    }).finally(function () { inflight--; lastWrite = Date.now(); });
+  };
+  var sub = function (kind, path) {
+    return { onSnapshot: function (ok, err) { subs.push({ kind: kind, path: path, ok: ok, err: err }); poll(); } };
+  };
+  return {
+    doc: function (p) { var o = sub('doc', p); o.set = function (v) { return write(p, v, false); }; o.update = function (v) { return write(p, v, true); }; return o; },
+    collection: function (p) { return sub('col', p); }
+  };
+})();
+(function () {
+  'use strict';
+
+  /* ---------- 基本のヘルパー ---------- */
+  var app = document.getElementById('app');
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  var okPhoto = function (s) {
+    return typeof s === 'string' && s.length < 300000 && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(s);
+  };
+
+  /* ---------- 状態 ---------- */
+  var S = {
+    tab: 'home', side: 'g', sel: null, edit: false,
+    db: null, canWrite: null, loaded: false, offline: false,
+    site: {}, people: {}, story: {}
+  };
+  var known = {};          // path -> 文書が存在するか
+  var queue = {};          // path -> {patch, running}
+  var timers = {};
+
+  /* ---------- 固定の構成（家系図の位置など） ---------- */
+  var STORY = [
+    { id: 's1', when: '20〇〇.〇', title: '出会い', note: '［出会ったきっかけ・第一印象］' },
+    { id: 's2', when: '20〇〇.〇', title: 'おつきあい開始', note: '［はじめてのデート・思い出］' },
+    { id: 's3', when: '20〇〇.〇', title: 'プロポーズ', note: '［場所・ことば］' },
+    { id: 's4', when: 'Today', title: '今日', note: '［これからのこと・ご家族へのひとこと］' }
+  ];
+  var QA = ['好きな食べ物は？', '休日は何してる？', '相手のいいところは？', 'これからやりたいことは？'];
+  var COL = 72, ROW = 140, MX = 40, TOP = 44, R = 26, LAB = 84, BW = COL - 2;
+  var N = function (k, rel, long, mark, c, r, self) { return { k: k, rel: rel, long: long, mark: mark, c: c, r: r, self: !!self }; };
+  var TREE = {
+    g: {
+      col: '#4A1C28',
+      nodes: [
+        N('gGPa', '祖父', '新郎の父方の祖父', '祖父', 0, 0), N('gGPb', '祖母', '新郎の父方の祖母', '祖母', 1, 0),
+        N('gGMa', '祖父', '新郎の母方の祖父', '祖父', 3.375, 0), N('gGMb', '祖母', '新郎の母方の祖母', '祖母', 4.375, 0),
+        N('gF', '父', '新郎のお父さん', '父', 0.5, 1), N('gM', '母', '新郎のお母さん', '母', 1.5, 1),
+        N('gA1', '叔母①', '新郎の母方の叔母①（②の姉）', '叔', 3.75, 1), N('gA2', '叔母②', '新郎の母方の叔母②（①の妹）', '叔', 6.25, 1),
+        N('gB', '新郎', '新郎', '新郎', 1, 2, true),
+        N('gC1', 'いとこ①（男）', '新郎の母方のいとこ①（②の兄）', '男', 3, 2), N('gC2', 'いとこ②（女）', '新郎の母方のいとこ②（①の妹）', '女', 4.5, 2),
+        N('gC3', 'いとこ③（男）', '新郎の母方のいとこ③（④の兄）', '男', 5.5, 2), N('gC4', 'いとこ④（女）', '新郎の母方のいとこ④（③の妹）', '女', 7, 2),
+        N('gK1', '子①（男）', 'いとこ①の子①（男）', '男', 2.5, 3), N('gK2', '子②（男）', 'いとこ①の子②（男）', '男', 3.5, 3),
+        N('gK3', '子（男）', 'いとこ②の子（男）', '男', 4.5, 3), N('gK4', '子（女）', 'いとこ③の子（女）', '女', 5.5, 3),
+        N('gK5', '子①（男）', 'いとこ④の子①（男）', '男', 6.5, 3), N('gK6', '子②（男）', 'いとこ④の子②（男）', '男', 7.5, 3)
+      ],
+      units: [
+        { p: ['gGPa', 'gGPb'], k: ['gF'], couple: true }, { p: ['gGMa', 'gGMb'], k: ['gM', 'gA1', 'gA2'], couple: true },
+        { p: ['gF', 'gM'], k: ['gB'], couple: true }, { p: ['gA1'], k: ['gC1', 'gC2'] }, { p: ['gA2'], k: ['gC3', 'gC4'] },
+        { p: ['gC1'], k: ['gK1', 'gK2'] }, { p: ['gC2'], k: ['gK3'] }, { p: ['gC3'], k: ['gK4'] }, { p: ['gC4'], k: ['gK5', 'gK6'] }
+      ]
+    },
+    b: {
+      col: '#7A6455',
+      nodes: [
+        N('bGMa', '祖父', '新婦の母方の祖父', '祖父', 0, 0), N('bGMb', '祖母', '新婦の母方の祖母', '祖母', 1, 0),
+        N('bGPa', '祖父', '新婦の父方の祖父', '祖父', 2.25, 0), N('bGPb', '祖母', '新婦の父方の祖母', '祖母', 3.25, 0),
+        N('bM', '母', '新婦のお母さん', '母', 0.5, 1), N('bF', '父', '新婦のお父さん', '父', 1.5, 1), N('bU', '叔父', '新婦の父方の叔父', '叔', 4, 1),
+        N('bS', '姉', '新婦の姉', '姉', 0.5, 2), N('bB', '新婦', '新婦', '新婦', 1.5, 2, true),
+        N('bC1', 'いとこ（男）', '新婦の父方のいとこ（男）', '男', 3.5, 2), N('bC2', 'いとこ（女）', '新婦の父方のいとこ（女）', '女', 4.5, 2),
+        N('bC2h', '旦那さん', 'いとこ（女）の旦那さん', '夫', 5.5, 2),
+        N('bK1', '子①（男）', 'いとこ（男）の子①（男）', '男', 3, 3), N('bK2', '子②（男）', 'いとこ（男）の子②（男）', '男', 4, 3),
+        N('bK3', '子①（男）', 'いとこ（女）の子①（男）', '男', 5, 3)
+      ],
+      units: [
+        { p: ['bGMa', 'bGMb'], k: ['bM'], couple: true }, { p: ['bGPa', 'bGPb'], k: ['bF', 'bU'], couple: true },
+        { p: ['bM', 'bF'], k: ['bS', 'bB'], couple: true }, { p: ['bU'], k: ['bC1', 'bC2'] }, { p: ['bC1'], k: ['bK1', 'bK2'] },
+        { p: ['bC2', 'bC2h'], k: ['bK3'], couple: true }
+      ]
+    }
+  };
+  var NODE_BY = {};
+  ['g', 'b'].forEach(function (s) { TREE[s].nodes.forEach(function (n) { n.side = s; NODE_BY[n.k] = n; }); });
+
+  /* ---------- データの取り出し ---------- */
+  var dataOf = function (scope, id) {
+    if (scope === 'site') return S.site;
+    if (!S[scope][id]) S[scope][id] = {};
+    return S[scope][id];
+  };
+  var get = function (scope, id, field, def) {
+    var v = dataOf(scope, id)[field];
+    return (typeof v === 'string' && v !== '') ? v : (def == null ? '' : def);
+  };
+  var pathOf = function (scope, id) { return scope === 'site' ? 'site/main' : scope + '/' + id; };
+
+  /* ---------- 保存（1文書につき1回ずつ順番に） ---------- */
+  var toast = function (msg) {
+    var el = document.getElementById('status');
+    if (el) el.textContent = msg || '';
+  };
+  var noPermission = function () {
+    S.canWrite = false; S.edit = false;
+    render();
+    toast('この端末では編集できません。編集の権限がある人から招待を受けてください。');
+  };
+  var flush = async function (path, scope, id) {
+    var q = queue[path];
+    q.running = true;
+    while (Object.keys(q.patch).length) {
+      var patch = q.patch; q.patch = {};
+      try {
+        var ref = S.db.doc(path);
+        if (known[path]) {
+          await ref.update(patch);
+        } else {
+          await ref.set(Object.assign({}, dataOf(scope, id), patch));
+          known[path] = true;
+        }
+      } catch (e) {
+        if (e && e.code === 'invalid_argument' && known[path]) {
+          try { await S.db.doc(path).set(Object.assign({}, dataOf(scope, id), patch)); }
+          catch (e2) { q.running = false; noPermission(); return; }
+        } else if (e && e.code === 'invalid_argument') {
+          q.running = false; noPermission(); return;
+        } else if (e && e.code === 'quota_exceeded') {
+          toast('保存の上限に達しました。写真を減らしてください。');
+        } else {
+          toast('保存できませんでした。もう一度お試しください。');
+        }
+      }
+    }
+    q.running = false;
+  };
+  var save = function (scope, id, patch) {
+    if (!S.db) return;
+    var path = pathOf(scope, id);
+    var q = queue[path] || (queue[path] = { patch: {}, running: false });
+    Object.assign(q.patch, patch);
+    if (!q.running) flush(path, scope, id);
+  };
+  var saveSoon = function (scope, id, patch) {
+    var path = pathOf(scope, id);
+    timers[path + '#p'] = Object.assign(timers[path + '#p'] || {}, patch);
+    clearTimeout(timers[path]);
+    timers[path] = setTimeout(function () {
+      var p = timers[path + '#p']; timers[path + '#p'] = {};
+      save(scope, id, p);
+    }, 700);
+  };
+
+  /* ---------- 写真（縮小して JPEG にし、文書に入れる） ---------- */
+  var SIZES = { person: [320, 320], story: [640, 400], hero: [640, 400] };
+  var shrink = function (file, kind) {
+    return new Promise(function (resolve, reject) {
+      var fr = new FileReader();
+      fr.onerror = function () { reject(new Error('read')); };
+      fr.onload = function () {
+        var img = new Image();
+        img.onerror = function () { reject(new Error('img')); };
+        img.onload = function () {
+          var w = SIZES[kind][0], h = SIZES[kind][1];
+          var c = document.createElement('canvas'); c.width = w; c.height = h;
+          var g = c.getContext('2d');
+          var s = Math.max(w / img.width, h / img.height);
+          var dw = img.width * s, dh = img.height * s;
+          g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+          g.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+          var q = 0.82, out = c.toDataURL('image/jpeg', q);
+          while (out.length > 200000 && q > 0.4) { q -= 0.1; out = c.toDataURL('image/jpeg', q); }
+          resolve(out);
+        };
+        img.src = String(fr.result);
+      };
+      fr.readAsDataURL(file);
+    });
+  };
+
+  /* ---------- 画面のパーツ ---------- */
+  var field = function (scope, id, f, def, cls) {
+    return esc(get(scope, id, f, def));
+  };
+  var inputHTML = function (scope, id, f, label, ph, extra) {
+    var uid = 'in-' + scope + '-' + id + '-' + f;
+    return '<label class="vh" for="' + uid + '">' + esc(label) + '</label>' +
+      '<input class="in ' + (extra || '') + '" id="' + uid + '" data-f="' + scope + '.' + id + '.' + f + '" value="' + esc(get(scope, id, f)) + '" placeholder="' + esc(ph) + '" autocomplete="off">';
+  };
+  var photoTools = function (scope, id, kind, has) {
+    if (!S.edit) return '';
+    var uid = 'ph-' + scope + '-' + id;
+    return '<div class="tools"><label class="photoBtn" for="' + uid + '">写真を選ぶ<input class="vh" type="file" accept="image/*" id="' + uid + '" data-photo="' + scope + '.' + id + '.' + kind + '"></label>' +
+      (has ? '<button type="button" class="link" data-act="rmphoto" data-t="' + scope + '.' + id + '">写真を外す</button>' : '') + '</div>';
+  };
+
+  var headerHTML = function () {
+    var canEdit = S.db && S.canWrite === true;
+    return '<header class="top"><span class="tag"><span aria-hidden="true" style="width:14px;height:20px;background:var(--accent);display:inline-block"></span>Our families</span>' +
+      (canEdit ? '<button type="button" class="pill' + (S.edit ? ' on' : '') + '" data-act="edit" aria-pressed="' + S.edit + '">' + (S.edit ? '編集を終える' : '編集する') + '</button>' : '') +
+      '</header><div class="note" id="status" role="status" aria-live="polite"></div>' +
+      (S.edit ? '<p class="note edit">編集中です。入力すると自動で保存され、ほかの人の画面にも反映されます。</p>' : '') +
+      (!S.db ? '<p class="note">データベースに接続できません。</p>' : '');
+  };
+
+  var homeHTML = function () {
+    var hero = get('site', 'main', 'heroPhoto');
+    var gv = function (f, d) { return S.edit ? inputHTML('site', 'main', f, d, d, f === 'groom' || f === 'bride' ? 'big' : '') : '<span class="val' + (f === 'groom' || f === 'bride' ? '' : ' s') + '">' + field('site', 'main', f, d) + '</span>'; };
+    return '<section><div class="hero"><div class="cloud" style="top:150px;left:-60px;width:260px;height:120px;opacity:.95"></div><div class="cloud" style="top:90px;right:-70px;width:240px;height:130px;opacity:.9"></div><div class="cloud" style="top:210px;left:90px;width:260px;height:110px"></div>' +
+      '<div class="flag" aria-hidden="true">&amp;</div>' +
+      '<div class="heroPhoto">' + (okPhoto(hero) ? '<img src="' + hero + '" alt="ふたりの写真">' : 'ふたりの写真') + '</div></div>' +
+      '<div class="sheet"><h1 class="display">Nice to meet you</h1><p class="sub">ふたりのこと、家族のこと、ちょっとだけ紹介します</p>' +
+      photoTools('site', 'main', 'hero', okPhoto(hero)).replace('data-t="site.main"', 'data-t="site.main.heroPhoto"') +
+      '<div class="pair" style="margin-top:' + (S.edit ? '16px' : '0') + '"><div class="fld"><span class="lab">GROOM</span>' + gv('groom', '［新郎］') + '</div>' +
+      '<svg width="30" height="18" viewBox="0 0 26 16" fill="none" aria-hidden="true" style="flex:0 0 30px;margin-bottom:12px"><circle cx="9" cy="8" r="6.5" stroke="#C8202F" stroke-width="1.5"/><circle cx="17" cy="8" r="6.5" stroke="#C8202F" stroke-width="1.5"/></svg>' +
+      '<div class="fld r"><span class="lab">BRIDE</span>' + gv('bride', '［新婦］') + '</div></div>' +
+      '<div class="row2"><div class="fld"><span class="lab">DATE</span>' + gv('date', '20〇〇.〇.〇（〇）') + '</div><div class="fld"><span class="lab">PLACE</span>' + gv('place', '［会場名］') + '</div></div>' +
+      '<button type="button" class="cta" data-act="tab" data-t="family">家族を紹介する</button>' +
+      '<button type="button" class="ghost" data-act="tab" data-t="story">ふたりのストーリーを見る</button></div></section>';
+  };
+
+  var storyHTML = function () {
+    var items = STORY.map(function (s) {
+      var ph = get('story', s.id, 'photo');
+      var body;
+      if (S.edit) {
+        body = inputHTML('story', s.id, 'title', 'タイトル', s.title, '') +
+          '<div style="height:8px"></div>' + inputHTML('story', s.id, 'note', 'ひとこと', s.note, '') +
+          '<div style="height:8px"></div>' + inputHTML('story', s.id, 'when', '時期', s.when, '');
+      } else {
+        body = '<h3>' + field('story', s.id, 'title', s.title) + '</h3><p>' + field('story', s.id, 'note', s.note) + '</p>';
+      }
+      var photo = okPhoto(ph) ? '<div class="ph"><img src="' + ph + '" alt=""></div>' : (S.edit || s.id !== 's4' ? '<div class="ph">写真</div>' : '');
+      return '<li><span class="when">' + (S.edit ? '' : field('story', s.id, 'when', s.when)) + '</span><span class="rail" aria-hidden="true"><i></i><b></b></span><div class="body">' + body + photo + photoTools('story', s.id, 'story', okPhoto(ph)) + '</div></li>';
+    }).join('');
+    var qa = QA.map(function (q, i) {
+      var g = 'qa' + i + 'g', b = 'qa' + i + 'b';
+      if (S.edit) {
+        return '<div><span class="lab">' + esc(q) + '</span>' + inputHTML('site', 'main', g, q + ' 新郎', '新郎　［　　］') + '<div style="height:6px"></div>' + inputHTML('site', 'main', b, q + ' 新婦', '新婦　［　　］') + '</div>';
+      }
+      return '<div><span class="lab">' + esc(q) + '</span><p>新郎　' + field('site', 'main', g, '［　　］') + '</p><p>新婦　' + field('site', 'main', b, '［　　］') + '</p></div>';
+    }).join('');
+    return '<section><div class="page"><h2 class="display">Our story</h2><p class="sub">出会いから今日まで</p></div><ol class="tl">' + items + '</ol><h3 class="display">Q &amp; A</h3><div class="qa">' + qa + '</div></section>';
+  };
+
+  var nodeName = function (n) { return get('people', n.k, 'name', n.self ? '［氏名］' : '［お名前］'); };
+  var treeHTML = function () {
+    var T = TREE[S.side];
+    var X = function (n) { return MX + n.c * COL; };
+    var Y = function (n) { return TOP + n.r * ROW; };
+    var by = {}; T.nodes.forEach(function (n) { by[n.k] = n; });
+    var d = '', rings = '';
+    var circ = function (cx, cy, r) { return 'M' + (cx - r) + ' ' + cy + ' a' + r + ' ' + r + ' 0 1 0 ' + (2 * r) + ' 0 a' + r + ' ' + r + ' 0 1 0 ' + (-2 * r) + ' 0 '; };
+    T.units.forEach(function (u) {
+      var ps = u.p.map(function (k) { return by[k]; }), ks = u.k.map(function (k) { return by[k]; });
+      var cy = Y(ps[0]), br = cy + 100, sx, sy;
+      if (u.couple) {
+        var x1 = X(ps[0]), x2 = X(ps[1]);
+        sx = (x1 + x2) / 2; sy = cy;
+        d += 'M' + (x1 + R) + ' ' + cy + ' H' + (x2 - R) + ' ';
+        rings += circ(sx - 3.5, cy, 5) + circ(sx + 3.5, cy, 5);
+      } else { sx = X(ps[0]); sy = cy + LAB; }
+      var xs = ks.map(X);
+      d += 'M' + sx + ' ' + sy + ' V' + br + ' M' + Math.min.apply(null, [sx].concat(xs)) + ' ' + br + ' H' + Math.max.apply(null, [sx].concat(xs)) + ' ';
+      ks.forEach(function (k) { d += 'M' + X(k) + ' ' + br + ' V' + (Y(k) - R - 3) + ' '; });
+    });
+    var maxC = Math.max.apply(null, T.nodes.map(function (n) { return n.c; }));
+    var maxR = Math.max.apply(null, T.nodes.map(function (n) { return n.r; }));
+    var W = Math.round(MX * 2 + maxC * COL), H = TOP + maxR * ROW + LAB + 24;
+    var nodes = T.nodes.map(function (n) {
+      var ph = get('people', n.k, 'photo');
+      return '<button type="button" class="node" data-act="pick" data-key="' + n.k + '" aria-pressed="' + (S.sel === n.k) + '" style="left:' + (X(n) - BW / 2) + 'px;top:' + (Y(n) - R - 4) + 'px;width:' + BW + 'px">' +
+        '<span class="av' + (n.self ? ' self' : '') + (n.mark.length > 1 ? ' long' : '') + '">' + (okPhoto(ph) ? '<img src="' + ph + '" alt="">' : esc(n.mark)) + '</span>' +
+        '<span class="rel">' + esc(n.rel) + '</span><span class="nm" data-label="' + n.k + '">' + esc(nodeName(n)) + '</span></button>';
+    }).join('');
+    return '<div class="scroller"><div class="tree" style="--side:' + T.col + ';width:' + W + 'px;height:' + H + 'px">' +
+      '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true"><path d="' + d + '" fill="none" stroke="' + T.col + '" stroke-width="1.5" stroke-opacity=".6" stroke-linejoin="round"/><path d="' + rings + '" fill="#F1F3F7" stroke="#C8202F" stroke-width="1.5"/></svg>' + nodes + '</div></div>';
+  };
+
+  var detailHTML = function () {
+    var n = S.sel && NODE_BY[S.sel];
+    if (!n) return '<div class="empty">家系図の丸をタップすると、<br>その方の紹介がここに開きます</div>';
+    var ph = get('people', n.k, 'photo');
+    var defName = n.self ? (n.side === 'g' ? '［新郎　氏名］' : '［新婦　氏名］') : '［お名前］';
+    var F = [['live', 'お住まい', '［都道府県］'], ['job', 'お仕事', '［　　　］'], ['likes', '好きなもの', '［　　　］'], ['msg', 'ひとこと', '［　　　］']];
+    var cells = F.map(function (f) {
+      if (S.edit) return '<div><span class="lab">' + f[1] + '</span>' + inputHTML('people', n.k, f[0], f[1], f[2], '') + '</div>';
+      return '<div><span class="lab">' + f[1] + '</span><p>' + field('people', n.k, f[0], f[2]) + '</p></div>';
+    }).join('');
+    return '<div class="detail"><div class="head"><div class="pic">' + (okPhoto(ph) ? '<img src="' + ph + '" alt="">' : '写真') + '</div>' +
+      '<div class="who"><p class="rl">' + esc(n.long) + '</p>' + (S.edit ? inputHTML('people', n.k, 'name', 'お名前', defName, '') : '<p class="nmv" data-label2="' + n.k + '">' + esc(get('people', n.k, 'name', defName)) + '</p>') + '</div>' +
+      '<button type="button" class="x" data-act="close" aria-label="閉じる">×</button></div>' +
+      photoTools('people', n.k, 'person', okPhoto(ph)) +
+      '<div class="grid2' + (S.edit ? ' edit' : '') + '">' + cells + '</div></div>';
+  };
+
+  var familyHTML = function () {
+    var msgDefault = '新婦のご家族は、ほとんどが北海道に。\n新郎のご家族は、北海道の外に全国バラバラです。';
+    var msg = S.edit
+      ? '<label class="lab" for="in-msg">ひとこと</label><textarea class="in" id="in-msg" data-f="site.main.message" rows="3">' + esc(get('site', 'main', 'message', msgDefault)) + '</textarea>'
+      : '<p>' + esc(get('site', 'main', 'message', msgDefault)) + '</p>';
+    return '<section><div class="page"><h2 class="display">Our families</h2><p class="sub">ご家族のご紹介</p></div>' +
+      '<div class="msg"><div class="bar"></div>' + msg + '</div>' +
+      '<div class="seg" role="group" aria-label="家の切り替え"><button type="button" data-act="side" data-t="g" aria-pressed="' + (S.side === 'g') + '" style="' + (S.side === 'g' ? 'background:#4A1C28' : '') + '">新郎家</button>' +
+      '<button type="button" data-act="side" data-t="b" aria-pressed="' + (S.side === 'b') + '" style="' + (S.side === 'b' ? 'background:#7A6455' : '') + '">新婦家</button></div>' +
+      treeHTML() + '<p class="hint">横にスクロールできます。丸をタップすると紹介が開きます。</p>' +
+      '<div class="detailWrap" id="detail">' + detailHTML() + '</div></section>';
+  };
+
+  var navHTML = function () {
+    var T = [['home', 'ホーム'], ['story', 'ストーリー'], ['family', '家族']];
+    return '<nav class="nav" aria-label="メニュー"><div>' + T.map(function (t) {
+      return '<button type="button" data-act="tab" data-t="' + t[0] + '" aria-current="' + (S.tab === t[0] ? 'page' : 'false') + '"><i></i>' + t[1] + '</button>';
+    }).join('') + '</div></nav>';
+  };
+
+  /* ---------- 描画 ---------- */
+  var keepStatus = '';
+  function render() {
+    var st = document.getElementById('status');
+    if (st) keepStatus = st.textContent;
+    var body = S.tab === 'story' ? storyHTML() : S.tab === 'family' ? familyHTML() : homeHTML();
+    var sc = document.querySelector('.scroller');
+    var left = sc ? sc.scrollLeft : 0;
+    app.innerHTML = headerHTML() + body + navHTML();
+    var sc2 = document.querySelector('.scroller');
+    if (sc2 && left) sc2.scrollLeft = left;
+    var st2 = document.getElementById('status');
+    if (st2) st2.textContent = keepStatus;
+  }
+  function typing() {
+    var a = document.activeElement;
+    return a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') && app.contains(a);
+  }
+  function softRender() {
+    if (typing()) {
+      // 入力中は画面を作り直さず、名前の表示だけ更新する
+      document.querySelectorAll('[data-label]').forEach(function (el) {
+        var n = NODE_BY[el.getAttribute('data-label')];
+        if (n) el.textContent = nodeName(n);
+      });
+      return;
+    }
+    render();
+  }
+  function setTab(t) {
+    S.tab = t; S.sel = null;
+    try { history.replaceState(null, '', '#' + t); } catch (e) { /* ignore */ }
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- 操作 ---------- */
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest ? e.target.closest('[data-act]') : null;
+    if (!el || !app.contains(el)) return;
+    var act = el.getAttribute('data-act'), t = el.getAttribute('data-t');
+    if (act === 'tab') setTab(t);
+    else if (act === 'side') { S.side = t; S.sel = null; render(); }
+    else if (act === 'pick') {
+      var k = el.getAttribute('data-key');
+      S.sel = S.sel === k ? null : k; render();
+    }
+    else if (act === 'close') { S.sel = null; render(); }
+    else if (act === 'edit') { S.edit = !S.edit; render(); }
+    else if (act === 'rmphoto') {
+      var p = t.split('.'); var scope = p[0], id = p[1], f = p[2] || 'photo';
+      dataOf(scope, id)[f] = '';
+      var patch = {}; patch[f] = '';
+      save(scope, id, patch); render();
+    }
+  });
+  document.addEventListener('input', function (e) {
+    var t = e.target;
+    var f = t && t.getAttribute ? t.getAttribute('data-f') : null;
+    if (!f) return;
+    var p = f.split('.'); var scope = p[0], id = p[1], name = p[2];
+    dataOf(scope, id)[name] = t.value;
+    var patch = {}; patch[name] = t.value;
+    saveSoon(scope, id, patch);
+    if (scope === 'people' && name === 'name') {
+      var n = NODE_BY[id];
+      var lab = document.querySelector('[data-label="' + id + '"]');
+      if (lab && n) lab.textContent = nodeName(n);
+    }
+  });
+  document.addEventListener('change', async function (e) {
+    var t = e.target;
+    var ph = t && t.getAttribute ? t.getAttribute('data-photo') : null;
+    if (!ph || !t.files || !t.files[0]) return;
+    var p = ph.split('.'); var scope = p[0], id = p[1], kind = p[2];
+    var fieldName = kind === 'hero' ? 'heroPhoto' : 'photo';
+    toast('写真を保存しています');
+    try {
+      var url = await shrink(t.files[0], kind === 'story' ? 'story' : kind === 'hero' ? 'hero' : 'person');
+      dataOf(scope, id)[fieldName] = url;
+      var patch = {}; patch[fieldName] = url;
+      save(scope, id, patch);
+      toast('');
+      render();
+    } catch (err) {
+      toast('この写真は読み込めませんでした。別の写真をお試しください。');
+    }
+  });
+  window.addEventListener('hashchange', function () {
+    var h = location.hash.replace('#', '');
+    if (['home', 'story', 'family'].indexOf(h) >= 0 && h !== S.tab) { S.tab = h; S.sel = null; render(); }
+  });
+
+  /* ---------- 共有データの購読 ---------- */
+  var use = function (name) {
+    return Promise.resolve(name === 'db' ? db : { can: function () { return Promise.resolve(EDIT_OK); } });
+  };
+  async function start() {
+    var h = location.hash.replace('#', '');
+    if (['home', 'story', 'family'].indexOf(h) >= 0) S.tab = h;
+    render();
+    var db = null, user = null;
+    try { db = await use('db'); user = await use('user'); } catch (e) { db = null; }
+    S.db = db;
+    if (!db) { render(); return; }
+    try { S.canWrite = user ? await user.can('data.write') : null; } catch (e) { S.canWrite = null; }
+    if (S.canWrite === undefined) S.canWrite = null;
+    render();
+    var timer = setTimeout(function () { if (!S.loaded) toast('最新の内容を取得できていません。通信を確認してください。'); }, 10000);
+    var mark = function (snap) {
+      if (snap.metadata && !snap.metadata.fromCache) { S.loaded = true; clearTimeout(timer); toast(''); }
+    };
+    var onErr = function (e) { clearTimeout(timer); if (!e || e.code !== 'revoked') toast('内容を読み込めませんでした。'); };
+    db.doc('site/main').onSnapshot(function (snap) {
+      S.site = snap.exists ? Object.assign({}, snap.data()) : {};
+      known['site/main'] = snap.exists; mark(snap); softRender();
+    }, onErr);
+    db.collection('people').onSnapshot(function (snap) {
+      var next = {}; snap.docs.forEach(function (d) { next[d.id] = Object.assign({}, d.data()); known['people/' + d.id] = true; });
+      S.people = next; mark(snap); softRender();
+    }, onErr);
+    db.collection('story').onSnapshot(function (snap) {
+      var next = {}; snap.docs.forEach(function (d) { next[d.id] = Object.assign({}, d.data()); known['story/' + d.id] = true; });
+      S.story = next; mark(snap); softRender();
+    }, onErr);
+  }
+  start();
+})();
+</script>
+</body>
+</html>
