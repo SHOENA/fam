@@ -14,9 +14,7 @@
   ];
 </script>
 
-{#if !n}
-  <div class="empty">家系図の丸をタップすると、<br />その方の紹介がここに開きます</div>
-{:else}
+{#if n}
   {@const ph = val('people', n.k, 'photo')}
   {@const defName = n.self ? (n.side === 'g' ? '［新郎　氏名］' : '［新婦　氏名］') : '［お名前］'}
   <div class="detail">

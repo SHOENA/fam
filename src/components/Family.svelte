@@ -26,5 +26,5 @@
   </div>
   <Tree />
   <p class="hint">横にスクロールできます。丸をタップすると紹介が開きます。</p>
-  <div class="detailWrap"><Detail /></div>
+  {#if app.sel}<div class="detailWrap"><Detail /></div>{/if}
 </section>
