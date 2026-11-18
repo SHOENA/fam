@@ -1,25 +1,33 @@
-# ふたりと家族の紹介（Cloudflare Pages + D1）
+# ふたりと家族の紹介（Vite + Svelte / Cloudflare Pages + D1）
 
-## しくみ
-- GitHub の main に push → GitHub Actions が自動でデプロイ（Cloudflareのビルド枠は使わない）
-- リポジトリに入るのはコードだけ。名前・写真・お住まい等は Cloudflare D1 にだけ保存（リポジトリには一切入らない）
-- 合言葉(EDIT_KEY)と APIトークンは、リポジトリではなく Cloudflare / GitHub の Secrets に置く
-- 無料枠: Pages・Functions 10万リクエスト/日、D1 読み取り500万行/日。画面を開いている間だけ10秒ごとに確認する設計で、家族数人なら余裕
+## 構成
+- src/ …… 画面（Svelte）。components/ に部品ごとのファイル
+- shared/ …… 家系図の構成・都道府県リスト（画面とサーバーで共通）
+- functions/api/ …… サーバー側（ログイン・データの読み書き）
+- server/lib/ …… 認証と入力検証、server/auth.test.js …… テスト
+- static/_headers …… セキュリティ設定
+- schema.sql …… D1のテーブル定義（デプロイ時に自動で作成）
 
-## 初回セットアップ（1回だけ）
-1. GitHub に新しいリポジトリ（公開でOK）を作り、このフォルダを push
-2. ローカルで: npm i -g wrangler && wrangler login
-3. wrangler d1 create fam → 出た database_id を wrangler.toml に貼って commit
-4. wrangler pages project create shiori --production-branch main
-5. wrangler pages secret put EDIT_KEY --project-name shiori   （家族だけの合言葉を入力）
-6. Cloudflare ダッシュボード > My Profile > API Tokens で、テンプレート「Edit Cloudflare Workers」を元に
-   権限に Account > D1 > Edit と Cloudflare Pages > Edit を含むトークンを作成
-7. GitHub リポジトリ > Settings > Secrets and variables > Actions に登録:
-   CLOUDFLARE_API_TOKEN（手順6）, CLOUDFLARE_ACCOUNT_ID（ダッシュボード右側に表示）
-8. main に push（または Actions タブから Run workflow）→ デプロイ完了
+## 認証のしくみ
+- 画面もデータも、合言葉でログインしないと見られません（データのAPIは全て要ログイン）。
+- 合言葉は2種類：VIEW_PASS（見るだけ）と EDIT_PASS（編集もできる）。
+- ログイン後は、署名つきのCookie（HttpOnly・Secure・SameSite=Strict・30日）で保持。
+- 同じ接続元から15分に5回、全体で60回まちがえると、15分ロック。
+- SESSION_SECRET を変更すると、全員がログアウトされます。
 
-以後は push するだけで更新されます。
+## Cloudflare に登録するシークレット（Pages > fam > 設定 > 変数とシークレット > 種類: シークレット）
+| 名前 | 内容 |
+|---|---|
+| SESSION_SECRET | 32文字以上のランダムな文字列（下記の方法で作る） |
+| EDIT_PASS | 編集用の合言葉（12文字以上を推奨） |
+| VIEW_PASS | 閲覧用の合言葉（12文字以上を推奨） |
 
-## URL
-- 閲覧用: https://shiori.pages.dev/
-- 編集用: https://shiori.pages.dev/?edit=合言葉（家族だけに共有）
+SESSION_SECRET の作り方：ブラウザの開発者ツール(F12)のコンソールで
+`crypto.randomUUID()+crypto.randomUUID()` を実行し、出た文字列を使う。
+古い EDIT_KEY は不要になるので削除してよい。シークレットは、次のデプロイから有効になる。
+
+## GitHub Actions の Secrets（変更なし）
+CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID
+
+## 更新のしかた
+main に push すると、テスト → ビルド → D1のテーブル確認 → デプロイが自動で動く。

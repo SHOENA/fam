@@ -1,0 +1,18 @@
+{
+  "name": "fam",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "wrangler pages dev dist --d1 DB=fam --compatibility-date=2024-11-01",
+    "test": "node --test server/auth.test.js"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "svelte": "^5.0.0",
+    "vite": "^6.0.0",
+    "wrangler": "^3.100.0"
+  }
+}
