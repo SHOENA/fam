@@ -5,7 +5,7 @@
   import Tree from './Tree.svelte';
   import Detail from './Detail.svelte';
 
-  const DEFAULT = '新婦の家族は、ほとんどが北海道に。\n新郎の家族は、北海道の外に全国バラバラです。';
+  const DEFAULT = '新婦の親族は、ほとんどが北海道に。\n新郎の親族は、北海道の外に全国バラバラです。';
   const pick = (s) => { app.side = s; app.sel = null; };
 </script>
 
