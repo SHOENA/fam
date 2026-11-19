@@ -3,10 +3,11 @@
   import { app, init, logout } from './lib/store.svelte.js';
   import Login from './components/Login.svelte';
   import Home from './components/Home.svelte';
+  import About from './components/About.svelte';
   import Story from './components/Story.svelte';
   import Family from './components/Family.svelte';
 
-  const TABS = [['home', 'ホーム'], ['story', 'ストーリー'], ['family', '家族']];
+  const TABS = [['home', 'HOME', 'ホーム'], ['about', 'ABOUT US', '自己紹介'], ['story', 'STORY', 'ストーリー'], ['family', 'FAMILY', '家族']];
 
   function go(t) {
     app.tab = t; app.sel = null;
@@ -34,7 +35,7 @@
 {:else}
   <div class="app">
     <header class="top">
-      <span class="tag"><span class="mark" aria-hidden="true"></span>Our families</span>
+      <span class="tag">Our families</span>
       <span class="topbtns">
         {#if app.role === 'edit'}
           <button type="button" class="pill" class:on={app.edit} aria-pressed={app.edit} onclick={() => (app.edit = !app.edit)}>
@@ -51,14 +52,28 @@
       <p class="note edit">編集中です。入力すると自動で保存され、ほかの人の画面にも反映されます。</p>
     {/if}
 
-    {#if app.tab === 'story'}<Story />{:else if app.tab === 'family'}<Family />{:else}<Home {go} />{/if}
-
-    <nav class="nav" aria-label="メニュー">
-      <div>
-        {#each TABS as [k, label]}
-          <button type="button" aria-current={app.tab === k ? 'page' : 'false'} onclick={() => go(k)}><i></i>{label}</button>
+    {#snippet tabs(big = false)}
+      <nav class="tiles" class:big aria-label="メニュー">
+        {#each TABS as [k, en, ja]}
+          <button type="button" class="tile" aria-current={app.tab === k ? 'page' : 'false'} onclick={() => go(k)}>
+            <span class="en">{en}</span>
+            <span class="ja">{ja}</span>
+          </button>
         {/each}
-      </div>
-    </nav>
+      </nav>
+    {/snippet}
+
+    {#if app.tab === 'about'}<About />{:else if app.tab === 'story'}<Story />{:else if app.tab === 'family'}<Family />{:else}<Home {tabs} />{/if}
+
+    {#if app.tab !== 'home'}
+      <nav class="mini" aria-label="メニュー">
+        <div>
+          {#each TABS as [k, en, ja]}
+            <button type="button" aria-current={app.tab === k ? 'page' : 'false'} onclick={() => go(k)}><span class="en">{en}</span><span class="ja">{ja}</span></button>
+          {/each}
+        </div>
+      </nav>
+    {/if}
+
   </div>
 {/if}

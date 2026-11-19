@@ -12,7 +12,6 @@
 <section>
   <div class="page"><h2 class="display">Our families</h2><p class="sub">ご家族のご紹介</p></div>
   <div class="msg">
-    <div class="bar"></div>
     {#if app.edit}
       <Input scope="site" id="main" field="message" label="ひとこと" kind="area" placeholder={DEFAULT} />
     {:else}
@@ -21,7 +20,7 @@
   </div>
   <div class="seg" role="group" aria-label="家の切り替え">
     {#each ['g', 'b'] as s}
-      <button type="button" aria-pressed={app.side === s} style:background={app.side === s ? TREE[s].color : ''} onclick={() => pick(s)}>{TREE[s].label}</button>
+      <button type="button" aria-pressed={app.side === s} onclick={() => pick(s)}>{TREE[s].label}</button>
     {/each}
   </div>
   <Tree />

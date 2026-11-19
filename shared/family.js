@@ -5,7 +5,7 @@ const N = (k, rel, long, mark, c, r, self = false) => ({ k, rel, long, mark, c, 
 
 export const TREE = {
   g: {
-    label: '新郎家', color: '#4A1C28',
+    label: '新郎家', color: '#111111',
     nodes: [
       N('gGPa', '祖父', '新郎の父方の祖父', '祖父', 0, 0), N('gGPb', '祖母', '新郎の父方の祖母', '祖母', 1, 0),
       N('gGMa', '祖父', '新郎の母方の祖父', '祖父', 3.375, 0), N('gGMb', '祖母', '新郎の母方の祖母', '祖母', 4.375, 0),
@@ -25,7 +25,7 @@ export const TREE = {
     ]
   },
   b: {
-    label: '新婦家', color: '#7A6455',
+    label: '新婦家', color: '#111111',
     nodes: [
       N('bGMa', '祖父', '新婦の母方の祖父', '祖父', 0, 0), N('bGMb', '祖母', '新婦の母方の祖母', '祖母', 1, 0),
       N('bGPa', '祖父', '新婦の父方の祖父', '祖父', 2.25, 0), N('bGPb', '祖母', '新婦の父方の祖母', '祖母', 3.25, 0),

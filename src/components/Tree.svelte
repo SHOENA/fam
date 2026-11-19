@@ -42,8 +42,8 @@
 <div class="scroller">
   <div class="tree" style:--side={T.color} style:width="{geo.W}px" style:height="{geo.H}px">
     <svg width={geo.W} height={geo.H} viewBox="0 0 {geo.W} {geo.H}" aria-hidden="true">
-      <path d={geo.d} fill="none" stroke={T.color} stroke-width="1.5" stroke-opacity=".6" stroke-linejoin="round" />
-      <path d={geo.rings} fill="#F1F3F7" stroke="#C8202F" stroke-width="1.5" />
+      <path d={geo.d} fill="none" stroke="#111" stroke-width="1" stroke-linejoin="round" />
+      <path d={geo.rings} fill="#fff" stroke="#111" stroke-width="1" />
     </svg>
     {#each geo.nodes as n (n.k)}
       {@const ph = val('people', n.k, 'photo')}

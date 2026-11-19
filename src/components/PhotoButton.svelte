@@ -2,7 +2,7 @@
   import { app, val, set } from '../lib/store.svelte.js';
   import { shrink, okPhoto } from '../lib/photo.js';
 
-  let { scope, id, field = 'photo', kind = 'person' } = $props();
+  let { scope, id, field = 'photo', kind = 'person', cls = '' } = $props();
   const uid = $derived(`ph-${scope}-${id}-${field}`);
   const has = $derived(okPhoto(val(scope, id, field)));
   let err = $state('');
@@ -19,7 +19,7 @@
 </script>
 
 {#if app.edit}
-  <div class="tools">
+  <div class="tools {cls}">
     <label class="photoBtn" for={uid}>写真を選ぶ<input class="vh" type="file" accept="image/*" id={uid} onchange={pick} /></label>
     {#if has}<button type="button" class="link" onclick={() => set(scope, id, field, '', true)}>写真を外す</button>{/if}
   </div>
