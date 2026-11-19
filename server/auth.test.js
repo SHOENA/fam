@@ -62,3 +62,17 @@ test('保存内容の検証', () => {
   assert.equal(validatePut('people', 'gGPa', { photo: '' }), null);
   assert.equal(validatePut('site', 'main', { qa3b: 'x', heroPhoto: '' }), null);
 });
+
+import { etagOf, etagMatches } from './lib/etag.js';
+
+test('ETag：同じ内容は同じ印、違う内容は違う印', async () => {
+  const a = await etagOf('{"a":1}');
+  assert.equal(a, await etagOf('{"a":1}'));
+  assert.notEqual(a, await etagOf('{"a":2}'));
+  assert.match(a, /^"[0-9a-f]{32}"$/);
+  assert.equal(etagMatches(a, a), true);
+  assert.equal(etagMatches(`W/${a}`, a), true);          // 圧縮で弱いETagになっても一致
+  assert.equal(etagMatches(`"x", ${a}`, a), true);
+  assert.equal(etagMatches('"other"', a), false);
+  assert.equal(etagMatches(null, a), false);
+});

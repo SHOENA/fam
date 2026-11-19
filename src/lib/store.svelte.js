@@ -7,12 +7,13 @@ export const app = $state({
 const POLL_MS = 10000;
 const HOLD_MS = 4000;      // 自分の保存の直後は、古いデータで上書きしない
 let lastWrite = 0, inflight = 0, pollTimer = null;
+let etag = '';             // 前回受け取った内容の印。変わっていなければ本体は届かない
 const pending = {};         // path -> {field: value}
 const timers = {};
 
 const call = (url, opts = {}) => fetch(url, { cache: 'no-store', credentials: 'same-origin', ...opts });
 const say = (m) => { app.message = m; };
-const backToLogin = () => { app.role = null; app.edit = false; stopPolling(); };
+const backToLogin = () => { app.role = null; app.edit = false; etag = ''; stopPolling(); };
 
 export const val = (scope, id, field) => {
   const d = scope === 'site' ? app.site : app[scope][id];
@@ -47,9 +48,11 @@ export async function logout() {
 }
 
 export async function load() {
-  const r = await call('/api/all');
+  const r = await call('/api/all', etag ? { headers: { 'if-none-match': etag } } : {});
+  if (r.status === 304) return;
   if (r.status === 401) { backToLogin(); return; }
   if (!r.ok) { say('最新の内容を取得できませんでした。'); return; }
+  etag = r.headers.get('etag') || '';
   const j = await r.json();
   const people = {}, story = {};
   for (const [path, d] of Object.entries(j)) {
