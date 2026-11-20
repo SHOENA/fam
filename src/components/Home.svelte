@@ -9,7 +9,7 @@
 
   // 拡大率（％）と位置（％）。100％は、枠いっぱいに広げた状態
   const num = (f, d) => { const n = parseFloat(val('site', 'main', f)); return Number.isFinite(n) ? n : d; };
-  const zoom = $derived(num('heroZoom', 100));
+  const zoom = $derived(Math.max(100, num('heroZoom', 100)));  // 100%＝枠いっぱい。これより小さくして余白は出さない
   const posX = $derived(num('heroX', 50));
   const posY = $derived(num('heroY', 50));
 
@@ -28,13 +28,8 @@
 
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   const fmt = (v) => String(Math.round(v * 10) / 10);
-  const putZoom = (v) => set('site', 'main', 'heroZoom', fmt(clamp(v, 30, 300)));
+  const putZoom = (v) => set('site', 'main', 'heroZoom', fmt(clamp(v, 100, 300)));
   const putPos = (x, y) => { set('site', 'main', 'heroX', fmt(clamp(x, 0, 100))); set('site', 'main', 'heroY', fmt(clamp(y, 0, 100))); };
-  const fitAll = () => {
-    if (!nat.w || !W || !H) return;
-    const k = Math.min(W / nat.w, H / nat.h) / Math.max(W / nat.w, H / nat.h);
-    putZoom(Math.max(30, k * 100)); putPos(50, 50);
-  };
   const reset = () => { for (const f of ['heroZoom', 'heroX', 'heroY']) set('site', 'main', f, '', true); };
 
   // ドラッグで移動、2本指（ピンチ）やホイールで拡大縮小
@@ -102,7 +97,6 @@
           <button type="button" class="photoBtn sq" onclick={() => putZoom(zoom - 10)} aria-label="縮小">−</button>
           <output class="zv">{Math.round(zoom)}%</output>
           <button type="button" class="photoBtn sq" onclick={() => putZoom(zoom + 10)} aria-label="拡大">＋</button>
-          <button type="button" class="photoBtn" onclick={fitAll}>写真全体を表示</button>
           <button type="button" class="link" onclick={reset}>元に戻す</button>
         </div>
         <button type="button" class="cta done" onclick={() => (adjusting = false)}>調整を終える</button>
