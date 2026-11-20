@@ -1,5 +1,5 @@
 // 保存してよい内容かを確認する（画面側の入力制限に頼らない）
-import { SCOPES, IDS, FIELDS, PHOTO_FIELDS } from '../../shared/family.js';
+import { SCOPES, IDS, FIELDS, PHOTO_FIELDS, NUM_FIELDS } from '../../shared/family.js';
 import { PREFS } from '../../shared/prefs.js';
 
 const PHOTO_RE = /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/;
@@ -19,6 +19,9 @@ export const validatePut = (scope, id, data) => {
     if (typeof v !== 'string') return 'bad value';
     if (PHOTO_FIELDS.includes(k)) {
       if (v !== '' && (v.length > MAX_PHOTO || !PHOTO_RE.test(v))) return 'bad photo';
+    } else if (scope === 'site' && NUM_FIELDS[k]) {
+      const [lo, hi] = NUM_FIELDS[k];
+      if (v !== '' && (!/^\d{1,3}$/.test(v) || +v < lo || +v > hi)) return 'bad value';
     } else if (v.length > MAX_TEXT) {
       return 'too long';
     } else if (scope === 'people' && k === 'live' && v !== '' && !PREFS.includes(v)) {

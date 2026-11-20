@@ -64,9 +64,11 @@ export const IDS = {
   site: ['main']
 };
 export const FIELDS = {
-  site: ['groom', 'bride', 'date', 'place', 'message', 'heroPhoto',
+  site: ['groom', 'bride', 'date', 'place', 'message', 'heroPhoto', 'heroZoom', 'heroX', 'heroY',
     ...QA.flatMap((_, i) => [`qa${i}g`, `qa${i}b`])],
   people: ['name', 'live', 'job', 'likes', 'msg', 'photo'],
   story: ['title', 'note', 'when', 'photo']
 };
 export const PHOTO_FIELDS = ['photo', 'heroPhoto'];
+// 数値の項目（文字列で保存）と、許す範囲。空は「初期値に戻す」の意味
+export const NUM_FIELDS = { heroZoom: [30, 300], heroX: [0, 100], heroY: [0, 100] };

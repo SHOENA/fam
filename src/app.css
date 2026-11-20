@@ -59,6 +59,12 @@ textarea.in{resize:vertical;min-height:84px}
 .link{min-height:44px;padding:0 12px;border:0;background:transparent;color:var(--muted);font-size:14px;text-decoration:underline}
 .hero .onPhoto{position:absolute;left:0;right:0;top:16px;margin:0;justify-content:center;z-index:2}
 .hero .onPhoto .link{background:rgba(255,255,255,.92);border-radius:0;color:var(--ink)}
+.adjust{margin:0;padding:18px 24px 6px;border-bottom:1px solid var(--line)}
+.adjTtl{margin:0 0 6px;font-family:var(--sans);font-size:12px;letter-spacing:.14em;color:var(--muted)}
+.rg{display:grid;grid-template-columns:48px 1fr 52px;align-items:center;gap:10px;min-height:44px;font-size:13px}
+.rg input[type=range]{width:100%;accent-color:var(--ink);min-height:44px;margin:0}
+.rg output{text-align:right;font-family:var(--sans);font-size:13px;color:var(--muted)}
+.adjBtns{display:flex;align-items:center;gap:16px;padding:6px 0 12px}
 .tools{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;margin-top:10px}
 
 /* ページ見出し */

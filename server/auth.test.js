@@ -51,6 +51,12 @@ test('保存内容の検証', () => {
   assert.equal(validatePut('people', 'gGPa', { name: 'たろう', live: '北海道' }), null);
   assert.equal(validatePut('people', 'gGPa', { live: '札幌' }), 'bad prefecture');
   assert.equal(validatePut('people', 'nobody', { name: 'a' }), 'bad id');
+  assert.equal(validatePut('site', 'main', { heroZoom: '120', heroX: '50', heroY: '0' }), null);
+  assert.equal(validatePut('site', 'main', { heroZoom: '' }), null);
+  assert.equal(validatePut('site', 'main', { heroZoom: '10' }), 'bad value');
+  assert.equal(validatePut('site', 'main', { heroX: '101' }), 'bad value');
+  assert.equal(validatePut('site', 'main', { heroY: 'abc' }), 'bad value');
+  assert.equal(validatePut('people', 'gGPa', { heroZoom: '100' }), 'bad field');
   assert.equal(validatePut('other', 'main', { a: 'b' }), 'bad scope');
   assert.equal(validatePut('people', 'gGPa', { admin: 'x' }), 'bad field');
   assert.equal(validatePut('people', 'gGPa', { name: 1 }), 'bad value');
