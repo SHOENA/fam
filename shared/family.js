@@ -70,5 +70,5 @@ export const FIELDS = {
   story: ['title', 'note', 'when', 'photo']
 };
 export const PHOTO_FIELDS = ['photo', 'heroPhoto'];
-// 数値の項目（文字列で保存）と、許す範囲。空は「初期値に戻す」の意味
+// 数値の項目（文字列で保存。小数は1桁まで）と、許す範囲。空は「初期値に戻す」の意味
 export const NUM_FIELDS = { heroZoom: [30, 300], heroX: [0, 100], heroY: [0, 100] };

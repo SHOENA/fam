@@ -53,6 +53,8 @@ test('保存内容の検証', () => {
   assert.equal(validatePut('people', 'nobody', { name: 'a' }), 'bad id');
   assert.equal(validatePut('site', 'main', { heroZoom: '120', heroX: '50', heroY: '0' }), null);
   assert.equal(validatePut('site', 'main', { heroZoom: '' }), null);
+  assert.equal(validatePut('site', 'main', { heroZoom: '87.5', heroX: '12.3' }), null);
+  assert.equal(validatePut('site', 'main', { heroX: '12.34' }), 'bad value');
   assert.equal(validatePut('site', 'main', { heroZoom: '10' }), 'bad value');
   assert.equal(validatePut('site', 'main', { heroX: '101' }), 'bad value');
   assert.equal(validatePut('site', 'main', { heroY: 'abc' }), 'bad value');

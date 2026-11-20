@@ -21,7 +21,7 @@ export const validatePut = (scope, id, data) => {
       if (v !== '' && (v.length > MAX_PHOTO || !PHOTO_RE.test(v))) return 'bad photo';
     } else if (scope === 'site' && NUM_FIELDS[k]) {
       const [lo, hi] = NUM_FIELDS[k];
-      if (v !== '' && (!/^\d{1,3}$/.test(v) || +v < lo || +v > hi)) return 'bad value';
+      if (v !== '' && (!/^\d{1,3}(\.\d)?$/.test(v) || +v < lo || +v > hi)) return 'bad value';
     } else if (v.length > MAX_TEXT) {
       return 'too long';
     } else if (scope === 'people' && k === 'live' && v !== '' && !PREFS.includes(v)) {
